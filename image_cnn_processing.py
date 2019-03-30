@@ -2,7 +2,10 @@
 """
 Created on Fri Mar 29 09:00:10 2019
 
-@author: Hrishikesh S
+@author: Hrishikesh S.
+
+DEVELOPER COMMENTS : # for explanation
+                     ## for removing code
 """
 
 # cd "Desktop/Third Year/Machine Learning/Project"
@@ -11,15 +14,13 @@ import numpy as np
 import cv2
 import os
 import pandas as pd
-from keras.preprocessing.image import load_img
+##from keras.preprocessing.image import load_img
 import matplotlib.pyplot as plt
 
 files = os.listdir("data")
 
 csv_files = pd.read_csv("data/trainVal.csv")
 
-##image = load_img("./data/crop_m1/100001.png")
-##plt.imshow(image)
 
 # cv2.IMREAD_COLOR : loads color image, use 1
 # cv2.IMREAD_GRAYSCALE : loads image in grayscale mode, use 0
