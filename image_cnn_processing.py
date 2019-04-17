@@ -212,7 +212,7 @@ print(binary_car_image)
 
 filtered_data, labels = homomorphic_filter(csv_files)
 
-cv2.imshow('Homomorphic filtered output', filtered_data[0])
+cv2.imshow('Homomorphic filtered output', filtered_data[100])
 cv2.waitKey(0)
 cv2.destroyAllWindows()
 
