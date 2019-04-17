@@ -123,64 +123,72 @@ def bwareaopen(imgBW, areaPixels):
 
 def homomorphic_filter(csv_files):
     filtered_data = []
+    labels = []
+    i = 0
     for index, row in csv_files.iterrows():
-        file = row['image_path']
-        filename = "data/"+ file.split(sep = '/')[1] + '/' + file.split(sep = '/')[2]
-        print(filename)
-        img = cv2.imread(filename, 0)
-        # Number of rows and columns
-        rows = img.shape[0]
-        cols = img.shape[1]
-        # Remove some columns from the beginning and end
-        img = img[:, 59:cols-20]
-        # Number of rows and columns
-        rows = img.shape[0]
-        cols = img.shape[1]
-        # Convert image to 0 to 1, then do log(1 + I)
-        imgLog = np.log1p(np.array(img, dtype="float") / 255)
-        # Create Gaussian mask of sigma = 10
-        M = 2*rows + 1
-        N = 2*cols + 1
-        sigma = 10
-        (X,Y) = np.meshgrid(np.linspace(0,N-1,N), np.linspace(0,M-1,M))
-        centerX = np.ceil(N/2)
-        centerY = np.ceil(M/2)
-        gaussianNumerator = (X - centerX)**2 + (Y - centerY)**2
-        # Low pass and high pass filters
-        Hlow = np.exp(-gaussianNumerator / (2*sigma*sigma))
-        Hhigh = 1 - Hlow
-        # Move origin of filters so that it's at the top left corner to
-        # match with the input image
-        HlowShift = scipy.fftpack.ifftshift(Hlow.copy())
-        HhighShift = scipy.fftpack.ifftshift(Hhigh.copy())
-        # Filter the image and crop
-        If = scipy.fftpack.fft2(imgLog.copy(), (M,N))
-        Ioutlow = scipy.real(scipy.fftpack.ifft2(If.copy() * HlowShift, (M,N)))
-        Iouthigh = scipy.real(scipy.fftpack.ifft2(If.copy() * HhighShift, (M,N)))
-        # Set scaling factors and add
-        gamma1 = 0.3
-        gamma2 = 1.5
-        Iout = gamma1*Ioutlow[0:rows,0:cols] + gamma2*Iouthigh[0:rows,0:cols]
-        # Anti-log then rescale to [0,1]
-        Ihmf = np.expm1(Iout)
-        Ihmf = (Ihmf - np.min(Ihmf)) / (np.max(Ihmf) - np.min(Ihmf))
-        Ihmf2 = np.array(255*Ihmf, dtype="uint8")
-        # Threshold the image - Anything below intensity 65 gets set to white
-        Ithresh = Ihmf2 < 65
-        Ithresh = 255*Ithresh.astype("uint8")
-        # Clear off the border.  Choose a border radius of 5 pixels
-        Iclear = imclearborder(Ithresh, 5)
-        # Eliminate regions that have areas below 120 pixels
-        Iopen = bwareaopen(Iclear, 120)
-        # Show all images
-        ##cv2.imshow('Original Image', img)
-        ##cv2.imshow('Homomorphic Filtered Result', Ihmf2)
-        ##cv2.imshow('Thresholded Result', Ithresh)
-        ##cv2.imshow('Opened Result', Iopen)
-        ##cv2.waitKey(0)
-        ##cv2.destroyAllWindows()
-        filtered_data.append(Iopen)
-    return filtered_data
+        i = i + 1
+        try:
+            file = row['image_path']
+            label = row['lp']
+            filename = "data/"+ file.split(sep = '/')[1] + '/' + file.split(sep = '/')[2]
+            print(i, filename)
+            img = cv2.imread(filename, 0)
+            # Number of rows and columns
+            rows = img.shape[0]
+            cols = img.shape[1]
+            # Remove some columns from the beginning and end
+            img = img[:, 59:cols-20]
+            # Number of rows and columns
+            rows = img.shape[0]
+            cols = img.shape[1]
+            # Convert image to 0 to 1, then do log(1 + I)
+            imgLog = np.log1p(np.array(img, dtype="float") / 255)
+            # Create Gaussian mask of sigma = 10
+            M = 2*rows + 1
+            N = 2*cols + 1
+            sigma = 10
+            (X,Y) = np.meshgrid(np.linspace(0,N-1,N), np.linspace(0,M-1,M))
+            centerX = np.ceil(N/2)
+            centerY = np.ceil(M/2)
+            gaussianNumerator = (X - centerX)**2 + (Y - centerY)**2
+            # Low pass and high pass filters
+            Hlow = np.exp(-gaussianNumerator / (2*sigma*sigma))
+            Hhigh = 1 - Hlow
+            # Move origin of filters so that it's at the top left corner to
+            # match with the input image
+            HlowShift = scipy.fftpack.ifftshift(Hlow.copy())
+            HhighShift = scipy.fftpack.ifftshift(Hhigh.copy())
+            # Filter the image and crop
+            If = scipy.fftpack.fft2(imgLog.copy(), (M,N))
+            Ioutlow = scipy.real(scipy.fftpack.ifft2(If.copy() * HlowShift, (M,N)))
+            Iouthigh = scipy.real(scipy.fftpack.ifft2(If.copy() * HhighShift, (M,N)))
+            # Set scaling factors and add
+            gamma1 = 0.3
+            gamma2 = 1.5
+            Iout = gamma1*Ioutlow[0:rows,0:cols] + gamma2*Iouthigh[0:rows,0:cols]
+            # Anti-log then rescale to [0,1]
+            Ihmf = np.expm1(Iout)
+            Ihmf = (Ihmf - np.min(Ihmf)) / (np.max(Ihmf) - np.min(Ihmf))
+            Ihmf2 = np.array(255*Ihmf, dtype="uint8")
+            # Threshold the image - Anything below intensity 65 gets set to white
+            Ithresh = Ihmf2 < 65
+            Ithresh = 255*Ithresh.astype("uint8")
+            # Clear off the border.  Choose a border radius of 5 pixels
+            Iclear = imclearborder(Ithresh, 5)
+            # Eliminate regions that have areas below 120 pixels
+            Iopen = bwareaopen(Iclear, 120)
+            # Show all images
+            ##cv2.imshow('Original Image', img)
+            ##cv2.imshow('Homomorphic Filtered Result', Ihmf2)
+            ##cv2.imshow('Thresholded Result', Ithresh)
+            ##cv2.imshow('Opened Result', Iopen)
+            ##cv2.waitKey(0)
+            ##cv2.destroyAllWindows()
+            filtered_data.append(Iopen)
+            labels.append(label)
+        except:
+            pass
+    return filtered_data, labels
 
 # gray scale data
 ##X_gray_scale, y_gray_scale = image_extraction(csv_files, 0)
@@ -202,7 +210,11 @@ ax2.imshow(binary_car_image, cmap = "gray")
 
 print(binary_car_image)
 
-filtered_data = homomorphic_filter(csv_files)
+filtered_data, labels = homomorphic_filter(csv_files)
+
+cv2.imshow('Homomorphic filtered output', filtered_data[0])
+cv2.waitKey(0)
+cv2.destroyAllWindows()
 
 # character segmentation
 ##labelled_plate = measure.label(license_plate)
