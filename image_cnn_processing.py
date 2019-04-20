@@ -552,4 +552,4 @@ LPR_model = build_model(X)
 
 LPR_model.summary()
 
-LPR_model = train_model(LPR_model, reshape_X, dummy_y, 10, 1)
+LPR_model = train_model(LPR_model, reshape_X, dummy_y, 100, 10)
