@@ -6,6 +6,7 @@ Created on Fri Mar 29 09:00:10 2019
 
 DEVELOPER COMMENTS : # for explanation
                      ## for removing code
+                     If Github repository downloaded, go to line 470
 """
 
 # cd "Desktop/Third Year/Machine Learning/Project"
@@ -23,6 +24,14 @@ from skimage.filters import threshold_otsu
 import pickle
 from PIL import Image
 import random
+import keras
+from keras.models import Sequential,Input,Model
+from keras.layers import Dense, Dropout, Flatten
+from keras.layers import Conv2D, MaxPooling2D
+from keras.layers.normalization import BatchNormalization
+from keras.layers.advanced_activations import LeakyReLU
+from keras.utils import np_utils
+from sklearn.preprocessing import LabelEncoder
 
 files = os.listdir("data")
 
@@ -320,7 +329,7 @@ def print_segments(segments):
 		individual.append(img)
 	return individual
 
-def convert_image_to_numpy():
+def convert_image_to_numpy(individual):
     characters = []
     for i in individual:
         inter_mediate = np.array(i)
@@ -458,4 +467,89 @@ def flip_and_rotate(copy_X):
     for i in range(0, len(clean)):
         cv2.imwrite('images/clean/' + str(i) + '.png', clean[i])
 
-## load binary image from segregated
+# if repository download, execute from here
+# load all binary image from segregated
+# grayscale load done to accomodate laoding of image as a 2d array
+def final_extraction(folder_list):
+    X = []
+    Y = []
+    # iterate through each folder
+    for folder in folder_list:
+        file_list = os.listdir('images/segregated/' + folder)
+        # iterate over all files in a folder
+        for file in file_list:
+            img = cv2.imread('images/segregated/' + folder + '/' + file, 0)
+            X.append(img)
+            Y.append(folder)
+    return X, Y
+
+# listing all folders
+folder_list = os.listdir('images/segregated/')
+# loading the images
+X, Y = final_extraction(folder_list)
+
+# determine maximum row & column size
+# to know the size to which we have to pad
+def determine_max_row_and_column_size(data):
+    max_row_size = 0
+    max_col_size = 0
+    for i in data:
+        size = np.shape(i)
+        if(size[0] > max_row_size):
+            max_row_size = size[0]
+        if(size[1] > max_col_size):
+            max_col_size = size[1]
+    return max_row_size, max_col_size
+
+pad_x, pad_y = determine_max_row_and_column_size(X)
+
+# padding by resizing
+# we can also do a zero padding
+def image_padding_by_resize(data, pad_x, pad_y):
+    out = []
+    for i in data:
+        u = cv2.resize(i, (pad_x, pad_y))
+        out.append(u)
+    return out
+
+# padding by resize
+X_final = image_padding_by_resize(X, pad_x, pad_y)
+
+# encode class values as integers
+# one hot encoding
+encoder = LabelEncoder()
+encoder.fit(Y)
+encoded_Y = encoder.transform(Y)
+# convert integers into categorical values 
+# by converting it into a bit array form (i.e. one hot encoded)
+dummy_y = np_utils.to_categorical(encoded_Y)
+
+reshape_X = np.reshape(X_final, (-1, 40, 140, 1))
+
+def build_model(data):
+    model = Sequential()
+    model.add(Conv2D(32, kernel_size=(3, 3),activation='linear',input_shape=(40, 140, 1),padding='same'))
+    model.add(LeakyReLU(alpha=0.1))
+    model.add(MaxPooling2D((2, 2),padding='same'))
+    model.add(Conv2D(64, (3, 3), activation='linear',padding='same'))
+    model.add(LeakyReLU(alpha=0.1))
+    model.add(MaxPooling2D(pool_size=(2, 2),padding='same'))
+    model.add(Conv2D(128, (3, 3), activation='linear',padding='same'))
+    model.add(LeakyReLU(alpha=0.1))                  
+    model.add(MaxPooling2D(pool_size=(2, 2),padding='same'))
+    model.add(Flatten())
+    model.add(Dense(128, activation='linear'))
+    model.add(LeakyReLU(alpha=0.1))                  
+    model.add(Dense(29, activation='softmax'))
+    model.compile(loss=keras.losses.categorical_crossentropy, optimizer=keras.optimizers.Adam(),metrics=['accuracy'])
+    return model
+
+def train_model(model, train_X, train_y, batch_size, epochs):
+    model = model.fit(train_X, train_y, batch_size=batch_size,epochs=epochs)
+    return model
+
+LPR_model = build_model(X)
+
+LPR_model.summary()
+
+LPR_model = train_model(LPR_model, reshape_X, dummy_y, 10, 1)
