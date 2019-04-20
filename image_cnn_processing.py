@@ -16,30 +16,13 @@ import os
 # For FFT2
 import scipy.fftpack  
 import pandas as pd
-##from keras.preprocessing.image import load_img
 import matplotlib.pyplot as plt
-from skimage.transform import resize
 from skimage import measure
-from skimage.measure import regionprops
-import matplotlib.patches as patches
-##import cca2
 from skimage.io import imread
 from skimage.filters import threshold_otsu
-from skimage import measure
-from skimage.measure import regionprops
-import matplotlib.pyplot as plt
-import matplotlib.patches as patches
-from skimage import measure
-from skimage.measure import regionprops
-from collections import namedtuple
-from skimage.filters import threshold_local
-from skimage import segmentation
-from skimage import measure
-from imutils import perspective
-import numpy as np
-import imutils
-
-##import localization
+import pickle
+from PIL import Image
+import random
 
 files = os.listdir("data")
 
@@ -190,12 +173,170 @@ def homomorphic_filter(csv_files):
             pass
     return filtered_data, labels
 
+# character segmentation algorithms
+# MSER Method (deprecated)
+# only draws contours around the alphabets
+# Maximally Stable External Region extractor
+def MSER():
+    img = cv2.imread('data/crop_h1/I00000.png')
+    mser = cv2.MSER_create()
+    # Resize the image so that MSER can work better
+    img = cv2.resize(img, (img.shape[1]*2, img.shape[0]*2))
+    gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+    vis = img.copy()
+    regions = mser.detectRegions(gray)
+    hulls = [cv2.convexHull(p.reshape(-1, 1, 2)) for p in regions[0]]
+    cv2.polylines(vis, hulls, 1, (0,255,0)) 
+    cv2.namedWindow('img', 0)
+    cv2.imshow('img', vis)
+    while(cv2.waitKey()!=ord('q')):
+        continue
+    cv2.destroyAllWindows()
+    cv2.imshow('Homomorphic filtered output', vis)
+    cv2.waitKey(0)
+    cv2.destroyAllWindows()
+    # cca v1
+    image = cv2.imread('data/crop_h1/I00000.png')
+    gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
+    blurred = cv2.GaussianBlur(gray, (11, 11), 0)
+    # threshold the image to reveal light regions in the
+    # blurred image
+    thresh = cv2.threshold(blurred, 200, 255, cv2.THRESH_BINARY)[1]
+    # perform a series of erosions and dilations to remove
+    # any small blobs of noise from the thresholded image
+    thresh = cv2.erode(thresh, None, iterations=2)
+    thresh = cv2.dilate(thresh, None, iterations=4)
+    # perform a connected component analysis on the thresholded
+    # image, then initialize a mask to store only the "large"
+    # components
+    labels = measure.label(thresh, neighbors=8, background=0)
+    mask = np.zeros(thresh.shape, dtype="uint8") 
+    # loop over the unique components
+    for label in np.unique(labels):
+    	# if this is the background label, ignore it
+    	if label == 0:
+    		continue 
+    	# otherwise, construct the label mask and count the
+    	# number of pixels 
+    	labelMask = np.zeros(thresh.shape, dtype="uint8")
+    	labelMask[labels == label] = 255
+    	numPixels = cv2.countNonZero(labelMask) 
+    	# if the number of pixels in the component is sufficiently
+    	# large, then add it to our mask of "large blobs"
+    	if numPixels > 300:
+    		mask = cv2.add(mask, labelMask)
+    cv2.imshow('Filtered output', mask)
+    cv2.waitKey(0)
+    cv2.destroyAllWindows()
+    return
+
+def get_component(data,i,j):
+	#returns a single component which is in the same component as i,j in the pixel
+	#set data[i][j] = 0 so that it will not go to an infinite loop
+	data[i][j] = 0
+	req = [(i,j)]
+	itr = 0
+	while(itr < len(req)):
+		x = req[itr][0]
+		y = req[itr][1]
+		itr+=1
+		if(x > 0):
+			if(data[x-1][y] == 255):
+				data[x-1][y] = 0
+				req.append((x-1,y))
+			if(y > 0):
+				if(data[x-1][y-1] == 255):
+					data[x-1][y-1] = 0
+					req.append((x-1,y-1))
+			if(y < len(data[0]) - 1):
+				if(data[x-1][y+1] == 255):
+					data[x-1][y+1] = 0
+					req.append((x-1,y+1))
+		if(y > 0):
+			if(data[x][y-1] == 255):
+				data[x][y-1] = 0
+				req.append((x,y-1))
+		if(x < len(data)-1):
+			if(data[x+1][y] == 255):
+				data[x+1][y] = 0
+				req.append((x+1,y))
+			if(y > 0):
+				if(data[x+1][y-1] == 255):
+					data[x+1][y-1] = 0
+					req.append((x+1,y-1))
+			if(y< len(data[0]) - 1):
+				if(data[x+1][y+1] == 255):
+					data[x+1][y+1] = 0
+					req.append((x+1,y+1))
+		if(y < len(data[0]) - 1):
+			if(data[x][y+1] == 255):
+				data[x][y+1] = 0
+				req.append((x,y+1))
+
+
+	return req
+
+def get_segments(data):
+	#sends an array of segmented images, provided the data has only 0->black and 255->white.
+	#the required output
+	segments = list()
+	for i in range(len(data)):
+		#for every row in the image 
+		for j in range(len(data[i])):
+			#for every cell in a row
+			if(data[i][j] == 255):
+				segments.append(get_component(data,i,j))
+	return segments 
+
+def print_segments(segments):
+	individual = []
+	for segment in segments:
+		#initialize to a very large value
+		top_left_row = 100000000
+		top_left_col = 100000000
+		bottom_right_row = -1
+		bottom_right_col = -1
+		#get the top left and bottom right co-ordinates to decide the size of the component
+		for (x,y) in segment:
+			top_left_col = min(top_left_col, y)
+			top_left_row = min(top_left_row, x)
+			bottom_right_col = max(bottom_right_col, y)
+			bottom_right_row = max(bottom_right_row, x)
+		#create a new image with the determined size
+		#+20 only to be on the safer side
+		#if you are modifying, it has to be atleast +1
+		img = Image.new('L',(bottom_right_row - top_left_row + 1, bottom_right_col - top_left_col + 1))
+		pixel = img.load()
+		#initialize all the pixels to be black
+		for i in range(bottom_right_row - top_left_row + 1):
+			for j in range(bottom_right_col - top_left_col + 1):
+				pixel[i, j] = 0
+		#for all the co-ordinates in the component, set it to white
+		for i in segment:
+			##print(i[0] - top_left_row," and ",i[1] - top_left_col)
+			pixel[i[0] - top_left_row, i[1] - top_left_col] = 255
+		#print the segment
+		##img.show()
+		individual.append(img)
+	return individual
+
+def convert_image_to_numpy():
+    characters = []
+    for i in individual:
+        inter_mediate = np.array(i)
+        characters.append(inter_mediate)    
+    for i in characters:
+        cv2.imshow('CHAR', i)
+        cv2.waitKey(0)
+        cv2.destroyAllWindows()
+    return characters
+
 # gray scale data
 ##X_gray_scale, y_gray_scale = image_extraction(csv_files, 0)
 # data with rgb
 ##X_rgb, y_rgb = image_extraction(csv_files, 1)
 
-# an example
+# an example to show difference between grayscale image and binary image
 license_plate = imread("data/crop_h1/I00000.png", as_grey = True)/255.0 
 print(license_plate.shape)
 
@@ -203,88 +344,118 @@ print(license_plate.shape)
 gray_car_image = license_plate * 255
 fig, (ax1, ax2) = plt.subplots(1, 2)
 ax1.imshow(gray_car_image, cmap = "gray")
+
 # threshold_otsu is an algorithm to reduce grayscale image to binary image
 threshold_value = threshold_otsu(gray_car_image)
 binary_car_image = gray_car_image > threshold_value
 ax2.imshow(binary_car_image, cmap = "gray")
 
 print(binary_car_image)
-
 filtered_data, labels = homomorphic_filter(csv_files)
 
-cv2.imshow('Homomorphic filtered output', filtered_data[0])
+# to show an image
+cv2.imshow('Homomorphic filtered output', filtered_data[578])
 cv2.waitKey(0)
 cv2.destroyAllWindows()
 
-# character segmentation
-img = cv2.imread('data/crop_h1/I00000.png')
-mser = cv2.MSER_create()
+# making a copy
+copy_filtered_data = filtered_data
 
-#Resize the image so that MSER can work better
-img = cv2.resize(img, (img.shape[1]*2, img.shape[0]*2))
+# saving / printing filtered data
+def save_filtered_data(copy_filtered_data, labels):
+    for i in range(0, len(copy_filtered_data)):
+        ##cv2.imwrite("images/filtered/" + labels[i] + "-" + str(i) + ".png", copy_filtered_data[i])
+        cv2.imshow(str(labels[i]) + " " + str(i), copy_filtered_data[i])
+        cv2.waitKey(0)
+        cv2.destroyAllWindows()
+    return
 
-gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
-vis = img.copy()
+def filtered_image_extraction(files):
+    clean_data = []
+    labels = []
+    for file in files:
+        img = cv2.imread("images/filtered/" + file, 1)
+        label = file.split(sep = "-")[0]
+        clean_data.append(img)
+        labels.append(label)
+    return clean_data, labels
 
-regions = mser.detectRegions(gray)
-hulls = [cv2.convexHull(p.reshape(-1, 1, 2)) for p in regions[0]]
-cv2.polylines(vis, hulls, 1, (0,255,0)) 
+filtered_files = os.listdir("images/filtered")
+clean_data, clean_labels = filtered_image_extraction(filtered_files)
+#m will be sent as reference and BE AWARE, once you call this m will be BLACK every where.
+#so if you want to store the original image some where make sure to copy in another variable
+segments_list = []
+for m in filtered_data:
+    corner_y = np.shape(m)[1] - 1
+    corner_x = np.shape(m)[0] - 1
+    get_component(m, 0, 0)
+    get_component(m, 0, corner_y)
+    get_component(m, corner_x, 0)
+    get_component(m, corner_x, corner_y)
+    segments_list.append(get_segments(m))
+#print("segments is ",segments)
+individual_list = []
+for segments in segments_list:
+    individual_list.append(print_segments(segments))
+#individual can be used for further processing
+# converting PIL image to numpy arrays
+X = []
+for plate in individual_list:
+    for char in plate:
+        X.append(np.array(char))
 
-cv2.namedWindow('img', 0)
-cv2.imshow('img', vis)
-while(cv2.waitKey()!=ord('q')):
-    continue
-cv2.destroyAllWindows()
+# for labels
+a = labels[0]
+for i in a:
+    print(i)
 
+Y = []
+for i in labels:
+    for j in i:
+        Y.append(j)
 
-cv2.imshow('Homomorphic filtered output', hulls[0])
-cv2.waitKey(0)
-cv2.destroyAllWindows()
-##labelled_plate = measure.label(license_plate)
-##fig, ax1 = plt.subplots(1)
-##ax1.imshow(license_plate, cmap = "gray")
-##character_dimensions = (0.35*license_plate.shape[0],
-##                        0.60*license_plate.shape[0],
-##                        0.05*license_plate.shape[1], 
-##                        0.15*license_plate.shape[1])
-##min_height, max_height, min_width, max_width = character_dimensions
+copy_X = X
 
-##cord = []
-##counter = 0
-##column_list = []
-##for regions in regionprops(labelled_plate):
-    ##y0, x0, y1, x1 = regions.bbox
-    ##region_height = y1 - y0
-    ##region_width = x1 - x0
-    ##if(region_height > min_height and region_height < max_height and region_width > min_width and region_width < max_width):
-        ##roi = license_plate[y0:y1, x0:x1]
-        ##rect_border = patches.Rectangle((x0, y0), x1 - x0, y1 - y0, edgecolor="red", linewidth=2, fill=False)
-        ##ax1.add_patch(rect_border)
-        ##resized_char = resize(roi, (20, 20))
-        
-# extract the Value component from the HSV color space and apply adaptive thresholding to reveal the characters on the license plate
-##V = cv2.split(cv2.cvtColor(license_plate, cv2.COLOR_BGR2HSV))[2]
-##T = threshold_local(V, 29, offset=15, method="gaussian")
-##thresh = (V > T).astype("uint8") * 255
-##thresh = cv2.bitwise_not(thresh)
- 
-# resize the license plate region to a canonical size
-##plate = imutils.resize(plate, width=400)
-##thresh = imutils.resize(thresh, width=400)
-##cv2.imshow("Thresh", thresh)
+index = []
+for i in range(0, len(copy_X)):
+    if(np.shape(copy_X[i])[0] > 40 or np.shape(copy_X[i])[0] < 15):
+        index.append(i)
 
+index = []
+for i in range(0, len(copy_X)):
+    if(np.shape(np.shape(copy_X[i])[1] < 15 or np.shape(copy_X[i])[1] > 100)):
+        index.append(i)
 
-# perform a connected components analysis and initialize the mask to store the locations of the character candidates
-##labels = measure.label(thresh, neighbors=8, background=0)
-##charCandidates = np.zeros(thresh.shape, dtype="uint8")
+for i in index:
+    cv2.imshow(str(i), copy_X[i])
+    cv2.waitKey(0)
+    cv2.destroyAllWindows()
 
-# loop over the unique components
-##for label in np.unique(labels):
-    # if this is the background label, ignore it
-	##if label == 0:
-		##continue
-    # otherwise, construct the label mask to display only connected components for the current label, then find contours in the label mask
-	##labelMask = np.zeros(thresh.shape, dtype="uint8")
-	##labelMask[labels == label] = 255
-	##cnts = cv2.findContours(labelMask, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
-	##cnts = cnts[0] if imutils.is_cv2() else cnts[1]
+def noise_removal(copy_X):
+    factor = 0
+    for i in index:
+        del copy_X[i - factor]
+        factor = factor + 1
+    ##return copy_X
+    for i in range(0, len(copy_X)):
+        file = "images/individual/" +  str(i)  + ".png"
+        cv2.imwrite(file, copy_X[i])
+        ##cv2.imshow(str(i), copy_X[i])
+        ##cv2.waitKey(0)
+        ##cv2.destroyAllWindows()
+
+def flip_and_rotate(copy_X):
+    clean = []
+    individual_files = os.listdir('images/individual')
+    for i in range(0, len(individual_files)):
+        img = cv2.imread('images/individual/' + individual_files[i])
+        ##img = copy_X[i]
+        img = cv2.flip(img, 1)
+        clean.append(img)
+    ##cv2.imshow(str(i), clean[0])
+    ##cv2.waitKey(0)
+    ##cv2.destroyAllWindows()
+    for i in range(0, len(clean)):
+        cv2.imwrite('images/clean/' + str(i) + '.png', clean[i])
+
+## load binary image from segregated
