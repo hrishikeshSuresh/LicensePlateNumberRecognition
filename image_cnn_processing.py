@@ -425,16 +425,19 @@ for i in labels:
 
 copy_X = X
 
+# collecting index row-wise removal
 index = []
 for i in range(0, len(copy_X)):
     if(np.shape(copy_X[i])[0] > 40 or np.shape(copy_X[i])[0] < 15):
         index.append(i)
 
+# collecting index column-wise removal
 index = []
 for i in range(0, len(copy_X)):
     if(np.shape(np.shape(copy_X[i])[1] < 15 or np.shape(copy_X[i])[1] > 100)):
         index.append(i)
 
+# display
 for i in index:
     cv2.imshow(str(i), copy_X[i])
     cv2.waitKey(0)
