@@ -6,7 +6,6 @@ Created on Fri Mar 29 09:00:10 2019
 
 DEVELOPER COMMENTS : # for explanation
                      ## for removing code
-                     If Github repository downloaded, go to line 470
 """
 
 # cd "Desktop/Third Year/Machine Learning/Project"
@@ -24,19 +23,10 @@ from skimage.filters import threshold_otsu
 import pickle
 from PIL import Image
 import random
-import keras
-from keras.models import Sequential,Input,Model
-from keras.layers import Dense, Dropout, Flatten
-from keras.layers import Conv2D, MaxPooling2D
-from keras.layers.normalization import BatchNormalization
-from keras.layers.advanced_activations import LeakyReLU
-from keras.utils import np_utils
 from sklearn.preprocessing import LabelEncoder
 
-files = os.listdir("data")
-
-csv_files = pd.read_csv("data/trainVal.csv")
-
+FILES = os.listdir("data")
+CSV_FILES = pd.read_csv("data/trainVal.csv")
 
 # cv2.IMREAD_COLOR : loads color image, use 1
 # cv2.IMREAD_GRAYSCALE : loads image in grayscale mode, use 0
@@ -240,9 +230,15 @@ def MSER():
     return
 
 def get_component(data,i,j):
-	#returns a single component which is in the same component as i,j in the pixel
-	#set data[i][j] = 0 so that it will not go to an infinite loop
-	data[i][j] = 0
+	"""
+    returns a single component which is in the same component as i,j in the pixel
+    #set data[i][j] = 0 so that it will not go to an infinite loop
+    image will be sent as reference and BE AWARE,
+    once you call this image will be BLACK every where.
+    so if you want to store the original image some where
+    make sure to copy in another variable
+    """
+    data[i][j] = 0
 	req = [(i,j)]
 	itr = 0
 	while(itr < len(req)):
@@ -286,8 +282,13 @@ def get_component(data,i,j):
 	return req
 
 def get_segments(data):
-	#sends an array of segmented images, provided the data has only 0->black and 255->white.
-	#the required output
+    """
+    sends an array of segmented images, provided the data has only 0->black and 255->white.
+    image will be sent as reference and BE AWARE,
+    once you call this image will be BLACK every where.
+    so if you want to store the original image some where
+    make sure to copy in another variable
+    """
 	segments = list()
 	for i in range(len(data)):
 		#for every row in the image 
@@ -345,31 +346,6 @@ def convert_image_to_numpy(individual):
 # data with rgb
 ##X_rgb, y_rgb = image_extraction(csv_files, 1)
 
-# an example to show difference between grayscale image and binary image
-license_plate = imread("data/crop_h1/I00000.png", as_grey = True)/255.0 
-print(license_plate.shape)
-
-# see the difference between gray scale and binary image
-gray_car_image = license_plate * 255
-fig, (ax1, ax2) = plt.subplots(1, 2)
-ax1.imshow(gray_car_image, cmap = "gray")
-
-# threshold_otsu is an algorithm to reduce grayscale image to binary image
-threshold_value = threshold_otsu(gray_car_image)
-binary_car_image = gray_car_image > threshold_value
-ax2.imshow(binary_car_image, cmap = "gray")
-
-print(binary_car_image)
-filtered_data, labels = homomorphic_filter(csv_files)
-
-# to show an image
-cv2.imshow('Homomorphic filtered output', filtered_data[578])
-cv2.waitKey(0)
-cv2.destroyAllWindows()
-
-# making a copy
-copy_filtered_data = filtered_data
-
 # saving / printing filtered data
 def save_filtered_data(copy_filtered_data, labels):
     for i in range(0, len(copy_filtered_data)):
@@ -388,60 +364,6 @@ def filtered_image_extraction(files):
         clean_data.append(img)
         labels.append(label)
     return clean_data, labels
-
-filtered_files = os.listdir("images/filtered")
-clean_data, clean_labels = filtered_image_extraction(filtered_files)
-#m will be sent as reference and BE AWARE, once you call this m will be BLACK every where.
-#so if you want to store the original image some where make sure to copy in another variable
-segments_list = []
-for m in filtered_data:
-    corner_y = np.shape(m)[1] - 1
-    corner_x = np.shape(m)[0] - 1
-    get_component(m, 0, 0)
-    get_component(m, 0, corner_y)
-    get_component(m, corner_x, 0)
-    get_component(m, corner_x, corner_y)
-    segments_list.append(get_segments(m))
-#print("segments is ",segments)
-individual_list = []
-for segments in segments_list:
-    individual_list.append(print_segments(segments))
-#individual can be used for further processing
-# converting PIL image to numpy arrays
-X = []
-for plate in individual_list:
-    for char in plate:
-        X.append(np.array(char))
-
-# for labels
-a = labels[0]
-for i in a:
-    print(i)
-
-Y = []
-for i in labels:
-    for j in i:
-        Y.append(j)
-
-copy_X = X
-
-# collecting index row-wise removal
-index = []
-for i in range(0, len(copy_X)):
-    if(np.shape(copy_X[i])[0] > 40 or np.shape(copy_X[i])[0] < 15):
-        index.append(i)
-
-# collecting index column-wise removal
-index = []
-for i in range(0, len(copy_X)):
-    if(np.shape(np.shape(copy_X[i])[1] < 15 or np.shape(copy_X[i])[1] > 100)):
-        index.append(i)
-
-# display
-for i in index:
-    cv2.imshow(str(i), copy_X[i])
-    cv2.waitKey(0)
-    cv2.destroyAllWindows()
 
 def noise_removal(copy_X):
     factor = 0
@@ -486,11 +408,6 @@ def final_extraction(folder_list):
             Y.append(folder)
     return X, Y
 
-# listing all folders
-folder_list = os.listdir('images/segregated/')
-# loading the images
-X, Y = final_extraction(folder_list)
-
 # determine maximum row & column size
 # to know the size to which we have to pad
 def determine_max_row_and_column_size(data):
@@ -504,8 +421,6 @@ def determine_max_row_and_column_size(data):
             max_col_size = size[1]
     return max_row_size, max_col_size
 
-pad_x, pad_y = determine_max_row_and_column_size(X)
-
 # padding by resizing
 # we can also do a zero padding
 def image_padding_by_resize(data, pad_x, pad_y):
@@ -515,44 +430,85 @@ def image_padding_by_resize(data, pad_x, pad_y):
         out.append(u)
     return out
 
-# padding by resize
-X_final = image_padding_by_resize(X, pad_x, pad_y)
+def show_sample():
+    """
+    show the image crop_h1/I00000.png in color,
+    grayscale and binary format
+    """
+    # an example to show difference between grayscale image and binary image
+    license_plate = imread("data/crop_h1/I00000.png", as_grey=True)/255.0
+    print(license_plate.shape)
+    # see the difference between gray scale and binary image
+    gray_car_image = license_plate * 255
+    _, (ax1, ax2) = plt.subplots(1, 2)
+    ax1.imshow(gray_car_image, cmap="gray")
+    # threshold_otsu is an algorithm to reduce grayscale image to binary image
+    threshold_value = threshold_otsu(gray_car_image)
+    binary_car_image = gray_car_image > threshold_value
+    ax2.imshow(binary_car_image, cmap="gray")
+    print(binary_car_image)
 
-# encode class values as integers
-# one hot encoding
-encoder = LabelEncoder()
-encoder.fit(Y)
-encoded_Y = encoder.transform(Y)
-# convert integers into categorical values 
-# by converting it into a bit array form (i.e. one hot encoded)
-dummy_y = np_utils.to_categorical(encoded_Y)
+def show_homomorphed_sample(image, n_index):
+    """
+    to show an homorphed image
+    """
+    cv2.imshow('Homomorphic filtered output', image[n_index])
+    cv2.waitKey(0)
+    cv2.destroyAllWindows()
 
-reshape_X = np.reshape(X_final, (-1, 40, 140, 1))
-
-def build_model(data):
-    model = Sequential()
-    model.add(Conv2D(32, kernel_size=(3, 3),activation='linear',input_shape=(40, 140, 1),padding='same'))
-    model.add(LeakyReLU(alpha=0.1))
-    model.add(MaxPooling2D((2, 2),padding='same'))
-    model.add(Conv2D(64, (3, 3), activation='linear',padding='same'))
-    model.add(LeakyReLU(alpha=0.1))
-    model.add(MaxPooling2D(pool_size=(2, 2),padding='same'))
-    model.add(Conv2D(128, (3, 3), activation='linear',padding='same'))
-    model.add(LeakyReLU(alpha=0.1))                  
-    model.add(MaxPooling2D(pool_size=(2, 2),padding='same'))
-    model.add(Flatten())
-    model.add(Dense(128, activation='linear'))
-    model.add(LeakyReLU(alpha=0.1))                  
-    model.add(Dense(29, activation='softmax'))
-    model.compile(loss=keras.losses.categorical_crossentropy, optimizer=keras.optimizers.Adam(),metrics=['accuracy'])
-    return model
-
-def train_model(model, train_X, train_y, batch_size, epochs):
-    model = model.fit(train_X, train_y, batch_size=batch_size,epochs=epochs)
-    return model
-
-LPR_model = build_model(X)
-
-LPR_model.summary()
-
-LPR_model = train_model(LPR_model, reshape_X, dummy_y, 100, 10)
+def preparing_data():
+    """
+    image extraction and processing
+    1. Homomorphic filter is applied on all images & saved in images/filtered
+    2. Segmenting the homomorphed images and extracting each
+       character from the images
+    3. Saving these segmented image to images/segmented
+       The character has to be manually re-arranged into folders
+       Each folder name is the character shown in the image
+    """
+    global CSV_FILES
+    show_sample()
+    filtered_data, filtered_labels = homomorphic_filter(CSV_FILES)
+    show_homomorphed_sample(filtered_data, 578)
+    ##clean_data, clean_labels = filtered_image_extraction(filtered_files)
+    segments_list = []
+    for each_plate in filtered_data:
+        corner_y = np.shape(each_plate)[1] - 1
+        corner_x = np.shape(each_plate)[0] - 1
+        get_component(each_plate, 0, 0)
+        get_component(each_plate, 0, corner_y)
+        get_component(each_plate, corner_x, 0)
+        get_component(each_plate, corner_x, corner_y)
+        segments_list.append(get_segments(each_plate))
+    individual_list = []
+    for segments in segments_list:
+        individual_list.append(print_segments(segments))
+    # individual_list can be used for further processing
+    # converting PIL image to numpy arrays
+    individual_images = []
+    for plate in individual_list:
+        for char in plate:
+            individual_images.append(np.array(char))
+    # for labels
+    labels = []
+    for i in filtered_labels:
+        for j in i:
+            labels.append(j)
+    copy_individual_images = individual_images
+    # collecting index row-wise removal
+    index = []
+    for i in range(0, len(copy_individual_images)):
+        if(np.shape(copy_individual_images[i])[0] > 40
+           or np.shape(copy_individual_images[i])[0] < 15):
+            index.append(i)
+    # collecting index column-wise removal
+    index = []
+    for i in range(0, len(copy_individual_images)):
+        if(np.shape(copy_individual_images[i])[1] < 15
+           or np.shape(copy_individual_images[i])[1] > 100):
+            index.append(i)
+    # display
+    for i in index:
+        cv2.imshow(str(i), copy_individual_images[i])
+        cv2.waitKey(0)
+        cv2.destroyAllWindows()
