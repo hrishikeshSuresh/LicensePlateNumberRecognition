@@ -1,0 +1,142 @@
+************* Module train
+E0001: 18,0: : Cannot import 'lpr_image_processing' due to syntax error 'unindent does not match any outer indentation level (<unknown>, line 240)'
+E1121: 98,16: train_and_save_model: Too many positional arguments for function call
+W0611:  8,0: : Unused import json
+W0611: 10,0: : Unused import h5py
+
+------------------------------------------------------------------
+
+Your code has been rated at 7.60/10 (previous run: 5.51/10, +2.09)
+
+************* Module lpr_image_processing
+C0301: 42,0: : Line too long (121/100)
+C0301: 78,0: : Line too long (107/100)
+C0301: 79,0: : Line too long (107/100)
+C0301:323,0: : Line too long (104/100)
+I1101: 46,14: image_extraction: Module 'cv2' has no 'imread' member, but source is unavailable. Consider adding this module to extension-pkg-whitelist if you want to perform analysis based on run-time introspection of living objects.
+C0103: 52,0: imclearborder: Argument name "imgBW" doesn't conform to snake_case naming style
+C0103: 59,4: imclearborder: Variable name "imgBWcopy" doesn't conform to snake_case naming style
+I1101: 60,21: imclearborder: Module 'cv2' has no 'findContours' member, but source is unavailable. Consider adding this module to extension-pkg-whitelist if you want to perform analysis based on run-time introspection of living objects.
+I1101: 61,38: imclearborder: Module 'cv2' has no 'RETR_LIST' member, but source is unavailable. Consider adding this module to extension-pkg-whitelist if you want to perform analysis based on run-time introspection of living objects.
+I1101: 62,38: imclearborder: Module 'cv2' has no 'CHAIN_APPROX_SIMPLE' member, but source is unavailable. Consider adding this module to extension-pkg-whitelist if you want to perform analysis based on run-time introspection of living objects.
+C0103: 64,4: imclearborder: Variable name "imgRows" doesn't conform to snake_case naming style
+C0103: 65,4: imclearborder: Variable name "imgCols" doesn't conform to snake_case naming style
+C0103: 67,4: imclearborder: Variable name "contourList" doesn't conform to snake_case naming style
+C0103: 73,12: imclearborder: Variable name "pt" doesn't conform to snake_case naming style
+C0103: 74,12: imclearborder: Variable name "rowCnt" doesn't conform to snake_case naming style
+C0103: 75,12: imclearborder: Variable name "colCnt" doesn't conform to snake_case naming style
+R1716: 78,22: imclearborder: Simplify chained comparison between the operands
+R1716: 78,59: imclearborder: Simplify chained comparison between the operands
+R1716: 79,22: imclearborder: Simplify chained comparison between the operands
+R1716: 79,59: imclearborder: Simplify chained comparison between the operands
+I1101: 84,8: imclearborder: Module 'cv2' has no 'drawContours' member, but source is unavailable. Consider adding this module to extension-pkg-whitelist if you want to perform analysis based on run-time introspection of living objects.
+C0103: 87,0: bwareaopen: Argument name "imgBW" doesn't conform to snake_case naming style
+C0103: 87,0: bwareaopen: Argument name "areaPixels" doesn't conform to snake_case naming style
+C0103: 94,4: bwareaopen: Variable name "imgBWcopy" doesn't conform to snake_case naming style
+I1101: 95,21: bwareaopen: Module 'cv2' has no 'findContours' member, but source is unavailable. Consider adding this module to extension-pkg-whitelist if you want to perform analysis based on run-time introspection of living objects.
+I1101: 96,38: bwareaopen: Module 'cv2' has no 'RETR_LIST' member, but source is unavailable. Consider adding this module to extension-pkg-whitelist if you want to perform analysis based on run-time introspection of living objects.
+I1101: 97,38: bwareaopen: Module 'cv2' has no 'CHAIN_APPROX_SIMPLE' member, but source is unavailable. Consider adding this module to extension-pkg-whitelist if you want to perform analysis based on run-time introspection of living objects.
+I1101:100,15: bwareaopen: Module 'cv2' has no 'contourArea' member, but source is unavailable. Consider adding this module to extension-pkg-whitelist if you want to perform analysis based on run-time introspection of living objects.
+R1716:101,12: bwareaopen: Simplify chained comparison between the operands
+I1101:102,12: bwareaopen: Module 'cv2' has no 'drawContours' member, but source is unavailable. Consider adding this module to extension-pkg-whitelist if you want to perform analysis based on run-time introspection of living objects.
+R0914:105,0: homomorphic_filter: Too many local variables (36/15)
+W0702:175,8: homomorphic_filter: No exception type(s) specified
+C0103:131,12: homomorphic_filter: Variable name "imgLog" doesn't conform to snake_case naming style
+C0103:133,12: homomorphic_filter: Variable name "M" doesn't conform to snake_case naming style
+C0103:134,12: homomorphic_filter: Variable name "N" doesn't conform to snake_case naming style
+C0103:136,13: homomorphic_filter: Variable name "X" doesn't conform to snake_case naming style
+C0103:136,16: homomorphic_filter: Variable name "Y" doesn't conform to snake_case naming style
+C0103:137,12: homomorphic_filter: Variable name "centerX" doesn't conform to snake_case naming style
+C0103:138,12: homomorphic_filter: Variable name "centerY" doesn't conform to snake_case naming style
+C0103:139,12: homomorphic_filter: Variable name "gaussianNumerator" doesn't conform to snake_case naming style
+C0103:141,12: homomorphic_filter: Variable name "Hlow" doesn't conform to snake_case naming style
+C0103:142,12: homomorphic_filter: Variable name "Hhigh" doesn't conform to snake_case naming style
+C0103:145,12: homomorphic_filter: Variable name "HlowShift" doesn't conform to snake_case naming style
+C0103:146,12: homomorphic_filter: Variable name "HhighShift" doesn't conform to snake_case naming style
+C0103:148,12: homomorphic_filter: Variable name "If" doesn't conform to snake_case naming style
+C0103:149,12: homomorphic_filter: Variable name "Ioutlow" doesn't conform to snake_case naming style
+C0103:150,12: homomorphic_filter: Variable name "Iouthigh" doesn't conform to snake_case naming style
+C0103:154,12: homomorphic_filter: Variable name "Iout" doesn't conform to snake_case naming style
+C0103:156,12: homomorphic_filter: Variable name "Ihmf" doesn't conform to snake_case naming style
+C0103:157,12: homomorphic_filter: Variable name "Ihmf" doesn't conform to snake_case naming style
+C0103:158,12: homomorphic_filter: Variable name "Ihmf2" doesn't conform to snake_case naming style
+C0103:160,12: homomorphic_filter: Variable name "Ithresh" doesn't conform to snake_case naming style
+C0103:161,12: homomorphic_filter: Variable name "Ithresh" doesn't conform to snake_case naming style
+C0103:163,12: homomorphic_filter: Variable name "Iclear" doesn't conform to snake_case naming style
+C0103:165,12: homomorphic_filter: Variable name "Iopen" doesn't conform to snake_case naming style
+C0103:179,0: MSER: Function name "MSER" doesn't conform to snake_case naming style
+I1101:185,10: MSER: Module 'cv2' has no 'imread' member, but source is unavailable. Consider adding this module to extension-pkg-whitelist if you want to perform analysis based on run-time introspection of living objects.
+I1101:186,11: MSER: Module 'cv2' has no 'MSER_create' member, but source is unavailable. Consider adding this module to extension-pkg-whitelist if you want to perform analysis based on run-time introspection of living objects.
+I1101:188,10: MSER: Module 'cv2' has no 'resize' member, but source is unavailable. Consider adding this module to extension-pkg-whitelist if you want to perform analysis based on run-time introspection of living objects.
+I1101:189,11: MSER: Module 'cv2' has no 'cvtColor' member, but source is unavailable. Consider adding this module to extension-pkg-whitelist if you want to perform analysis based on run-time introspection of living objects.
+I1101:189,29: MSER: Module 'cv2' has no 'COLOR_BGR2GRAY' member, but source is unavailable. Consider adding this module to extension-pkg-whitelist if you want to perform analysis based on run-time introspection of living objects.
+I1101:192,13: MSER: Module 'cv2' has no 'convexHull' member, but source is unavailable. Consider adding this module to extension-pkg-whitelist if you want to perform analysis based on run-time introspection of living objects.
+I1101:193,4: MSER: Module 'cv2' has no 'polylines' member, but source is unavailable. Consider adding this module to extension-pkg-whitelist if you want to perform analysis based on run-time introspection of living objects.
+I1101:194,4: MSER: Module 'cv2' has no 'namedWindow' member, but source is unavailable. Consider adding this module to extension-pkg-whitelist if you want to perform analysis based on run-time introspection of living objects.
+I1101:195,4: MSER: Module 'cv2' has no 'imshow' member, but source is unavailable. Consider adding this module to extension-pkg-whitelist if you want to perform analysis based on run-time introspection of living objects.
+I1101:196,10: MSER: Module 'cv2' has no 'waitKey' member, but source is unavailable. Consider adding this module to extension-pkg-whitelist if you want to perform analysis based on run-time introspection of living objects.
+I1101:198,4: MSER: Module 'cv2' has no 'destroyAllWindows' member, but source is unavailable. Consider adding this module to extension-pkg-whitelist if you want to perform analysis based on run-time introspection of living objects.
+I1101:199,4: MSER: Module 'cv2' has no 'imshow' member, but source is unavailable. Consider adding this module to extension-pkg-whitelist if you want to perform analysis based on run-time introspection of living objects.
+I1101:200,4: MSER: Module 'cv2' has no 'waitKey' member, but source is unavailable. Consider adding this module to extension-pkg-whitelist if you want to perform analysis based on run-time introspection of living objects.
+I1101:201,4: MSER: Module 'cv2' has no 'destroyAllWindows' member, but source is unavailable. Consider adding this module to extension-pkg-whitelist if you want to perform analysis based on run-time introspection of living objects.
+I1101:203,12: MSER: Module 'cv2' has no 'imread' member, but source is unavailable. Consider adding this module to extension-pkg-whitelist if you want to perform analysis based on run-time introspection of living objects.
+I1101:204,11: MSER: Module 'cv2' has no 'cvtColor' member, but source is unavailable. Consider adding this module to extension-pkg-whitelist if you want to perform analysis based on run-time introspection of living objects.
+I1101:204,31: MSER: Module 'cv2' has no 'COLOR_BGR2GRAY' member, but source is unavailable. Consider adding this module to extension-pkg-whitelist if you want to perform analysis based on run-time introspection of living objects.
+I1101:205,14: MSER: Module 'cv2' has no 'GaussianBlur' member, but source is unavailable. Consider adding this module to extension-pkg-whitelist if you want to perform analysis based on run-time introspection of living objects.
+I1101:208,13: MSER: Module 'cv2' has no 'threshold' member, but source is unavailable. Consider adding this module to extension-pkg-whitelist if you want to perform analysis based on run-time introspection of living objects.
+I1101:208,46: MSER: Module 'cv2' has no 'THRESH_BINARY' member, but source is unavailable. Consider adding this module to extension-pkg-whitelist if you want to perform analysis based on run-time introspection of living objects.
+I1101:211,13: MSER: Module 'cv2' has no 'erode' member, but source is unavailable. Consider adding this module to extension-pkg-whitelist if you want to perform analysis based on run-time introspection of living objects.
+I1101:212,13: MSER: Module 'cv2' has no 'dilate' member, but source is unavailable. Consider adding this module to extension-pkg-whitelist if you want to perform analysis based on run-time introspection of living objects.
+C0103:225,8: MSER: Variable name "labelMask" doesn't conform to snake_case naming style
+C0103:227,8: MSER: Variable name "numPixels" doesn't conform to snake_case naming style
+I1101:227,20: MSER: Module 'cv2' has no 'countNonZero' member, but source is unavailable. Consider adding this module to extension-pkg-whitelist if you want to perform analysis based on run-time introspection of living objects.
+I1101:231,19: MSER: Module 'cv2' has no 'add' member, but source is unavailable. Consider adding this module to extension-pkg-whitelist if you want to perform analysis based on run-time introspection of living objects.
+I1101:232,4: MSER: Module 'cv2' has no 'imshow' member, but source is unavailable. Consider adding this module to extension-pkg-whitelist if you want to perform analysis based on run-time introspection of living objects.
+I1101:233,4: MSER: Module 'cv2' has no 'waitKey' member, but source is unavailable. Consider adding this module to extension-pkg-whitelist if you want to perform analysis based on run-time introspection of living objects.
+I1101:234,4: MSER: Module 'cv2' has no 'destroyAllWindows' member, but source is unavailable. Consider adding this module to extension-pkg-whitelist if you want to perform analysis based on run-time introspection of living objects.
+C0103:249,8: get_component: Variable name "x" doesn't conform to snake_case naming style
+C0103:250,8: get_component: Variable name "y" doesn't conform to snake_case naming style
+R0912:236,0: get_component: Too many branches (17/12)
+C0200:295,4: get_segments: Consider using enumerate instead of iterating with range and len
+C0103:315,13: print_segments: Variable name "x" doesn't conform to snake_case naming style
+C0103:315,16: print_segments: Variable name "y" doesn't conform to snake_case naming style
+I1101:347,8: convert_image_to_numpy: Module 'cv2' has no 'imshow' member, but source is unavailable. Consider adding this module to extension-pkg-whitelist if you want to perform analysis based on run-time introspection of living objects.
+I1101:348,8: convert_image_to_numpy: Module 'cv2' has no 'waitKey' member, but source is unavailable. Consider adding this module to extension-pkg-whitelist if you want to perform analysis based on run-time introspection of living objects.
+I1101:349,8: convert_image_to_numpy: Module 'cv2' has no 'destroyAllWindows' member, but source is unavailable. Consider adding this module to extension-pkg-whitelist if you want to perform analysis based on run-time introspection of living objects.
+C0200:362,4: save_filtered_data: Consider using enumerate instead of iterating with range and len
+I1101:363,8: save_filtered_data: Module 'cv2' has no 'imwrite' member, but source is unavailable. Consider adding this module to extension-pkg-whitelist if you want to perform analysis based on run-time introspection of living objects.
+I1101:364,8: save_filtered_data: Module 'cv2' has no 'imshow' member, but source is unavailable. Consider adding this module to extension-pkg-whitelist if you want to perform analysis based on run-time introspection of living objects.
+I1101:365,8: save_filtered_data: Module 'cv2' has no 'waitKey' member, but source is unavailable. Consider adding this module to extension-pkg-whitelist if you want to perform analysis based on run-time introspection of living objects.
+I1101:366,8: save_filtered_data: Module 'cv2' has no 'destroyAllWindows' member, but source is unavailable. Consider adding this module to extension-pkg-whitelist if you want to perform analysis based on run-time introspection of living objects.
+I1101:375,14: filtered_image_extraction: Module 'cv2' has no 'imread' member, but source is unavailable. Consider adding this module to extension-pkg-whitelist if you want to perform analysis based on run-time introspection of living objects.
+C0103:381,0: noise_removal: Argument name "copy_X" doesn't conform to snake_case naming style
+C0200:390,4: noise_removal: Consider using enumerate instead of iterating with range and len
+I1101:392,8: noise_removal: Module 'cv2' has no 'imwrite' member, but source is unavailable. Consider adding this module to extension-pkg-whitelist if you want to perform analysis based on run-time introspection of living objects.
+C0200:403,4: flip_and_rotate: Consider using enumerate instead of iterating with range and len
+I1101:404,14: flip_and_rotate: Module 'cv2' has no 'imread' member, but source is unavailable. Consider adding this module to extension-pkg-whitelist if you want to perform analysis based on run-time introspection of living objects.
+I1101:406,14: flip_and_rotate: Module 'cv2' has no 'flip' member, but source is unavailable. Consider adding this module to extension-pkg-whitelist if you want to perform analysis based on run-time introspection of living objects.
+C0200:411,4: flip_and_rotate: Consider using enumerate instead of iterating with range and len
+I1101:412,8: flip_and_rotate: Module 'cv2' has no 'imwrite' member, but source is unavailable. Consider adding this module to extension-pkg-whitelist if you want to perform analysis based on run-time introspection of living objects.
+C0103:425,4: final_extraction: Variable name "X" doesn't conform to snake_case naming style
+C0103:426,4: final_extraction: Variable name "Y" doesn't conform to snake_case naming style
+I1101:432,18: final_extraction: Module 'cv2' has no 'imread' member, but source is unavailable. Consider adding this module to extension-pkg-whitelist if you want to perform analysis based on run-time introspection of living objects.
+C0103:464,8: image_padding_by_resize: Variable name "u" doesn't conform to snake_case naming style
+I1101:464,12: image_padding_by_resize: Module 'cv2' has no 'resize' member, but source is unavailable. Consider adding this module to extension-pkg-whitelist if you want to perform analysis based on run-time introspection of living objects.
+I1101:490,4: show_homomorphed_sample: Module 'cv2' has no 'imshow' member, but source is unavailable. Consider adding this module to extension-pkg-whitelist if you want to perform analysis based on run-time introspection of living objects.
+I1101:491,4: show_homomorphed_sample: Module 'cv2' has no 'waitKey' member, but source is unavailable. Consider adding this module to extension-pkg-whitelist if you want to perform analysis based on run-time introspection of living objects.
+I1101:492,4: show_homomorphed_sample: Module 'cv2' has no 'destroyAllWindows' member, but source is unavailable. Consider adding this module to extension-pkg-whitelist if you want to perform analysis based on run-time introspection of living objects.
+R0914:494,0: preparing_data: Too many local variables (16/15)
+W0603:504,4: preparing_data: Using the global statement
+C0200:535,4: preparing_data: Consider using enumerate instead of iterating with range and len
+C0200:541,4: preparing_data: Consider using enumerate instead of iterating with range and len
+I1101:547,8: preparing_data: Module 'cv2' has no 'imshow' member, but source is unavailable. Consider adding this module to extension-pkg-whitelist if you want to perform analysis based on run-time introspection of living objects.
+I1101:548,8: preparing_data: Module 'cv2' has no 'waitKey' member, but source is unavailable. Consider adding this module to extension-pkg-whitelist if you want to perform analysis based on run-time introspection of living objects.
+I1101:549,8: preparing_data: Module 'cv2' has no 'destroyAllWindows' member, but source is unavailable. Consider adding this module to extension-pkg-whitelist if you want to perform analysis based on run-time introspection of living objects.
+C0411: 22,0: : third party import "import matplotlib.pyplot as plt" should be placed before "import cv2"
+
+------------------------------------------------------------------
+
+Your code has been rated at 7.96/10 (previous run: 7.78/10, +0.18)
+
+
+
