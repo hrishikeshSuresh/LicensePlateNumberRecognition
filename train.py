@@ -4,17 +4,21 @@ Created on Sat May 18 14:32:19 2019
 
 @author: Hrishikesh S
 """
+
+# cd "Desktop/Third Year/Machine Learning/Project"
+
 import os
 import json
 import numpy as np
 import h5py
+from sklearn.preprocessing import LabelEncoder
 import keras
 from keras.models import Sequential
 from keras.layers import Dense, Flatten
 from keras.layers import Conv2D, MaxPooling2D
 from keras.layers.advanced_activations import LeakyReLU
 from keras.utils import np_utils
-import image_processing
+import lpr_image_processing
 
 def build_model():
     """
@@ -55,7 +59,11 @@ def build_model():
                   metrics=['accuracy'])
     return model
 
-def train_model(model, train_x, train_y, batch_size, epochs):
+def train_model(model,
+                train_x,
+                train_y,
+                batch_size,
+                epochs):
     """
     train the model
     model       - Sequential() added with all layers
@@ -64,11 +72,11 @@ def train_model(model, train_x, train_y, batch_size, epochs):
     batch_size  - batch size
     epochs      - number of epochs the model should train for
     """
-    model = model.fit(train_x,
+    history = model.fit(train_x,
                       train_y,
                       batch_size=batch_size,
                       epochs=epochs)
-    return model
+    return model, history
 
 def train_and_save_model():
     """
@@ -77,22 +85,22 @@ def train_and_save_model():
     # listing all folders
     folder_list = os.listdir('images/segregated')
     # loading the images
-    individual_images, labels = image_processing.final_extraction(folder_list)
-    pad_x, pad_y = image_processing.determine_max_row_and_column_size(individual_images)
+    individual_images, labels = lpr_image_processing.final_extraction(folder_list)
+    pad_x, pad_y = lpr_image_processing.determine_max_row_and_column_size(individual_images)
     # padding by resize
-    x_train = image_processing.image_padding_by_resize(individual_images, pad_x, pad_y)
+    x_train = lpr_image_processing.image_padding_by_resize(individual_images, pad_x, pad_y)
     # encode class values as integers
     # one hot encoding
-    encoder = image_processing.LabelEncoder()
+    encoder = LabelEncoder()
     encoder.fit(labels)
     y_encoded = encoder.transform(labels)
     # convert integers into categorical values
     # by converting it into a bit array form (i.e. one hot encoded)
     y_train = np_utils.to_categorical(y_encoded)
     x_train = np.reshape(x_train, (-1, 40, 140, 1))
-    lpr_model = build_model(x_train)
+    lpr_model = build_model()
     lpr_model.summary()
-    lpr_model = train_model(lpr_model, x_train, y_train, 100, 10)
+    lpr_model, _ = train_model(lpr_model, x_train, y_train, 100, 10)
     # save model
     # serialize model to JSON
     model_json = lpr_model.to_json()
