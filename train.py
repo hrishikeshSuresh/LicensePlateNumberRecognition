@@ -94,8 +94,8 @@ def train_and_save_model():
     # save model
     # serialize model to JSON
     model_json = lpr_model.to_json()
-    with open("models/english_model_2000.json", "w") as json_file:
+    with open("models/lpr.json", "w") as json_file:
         json_file.write(model_json)
     # serialize weights to HDF5
-    lpr_model.save_weights("models/english_model_2000.h5")
+    lpr_model.save_weights("models/lpr.h5")
     print("Saved model to disk")
